@@ -67,6 +67,72 @@ const bybitClient1 = new ccxt.bybit({
 });
 
 /** bybit update sl data */
+// router.get('/update-sl', async function (req, res) {
+//   try {
+//     req.query?.accountType === 'spot' ? await bybitClient.load_time_difference() : await bybitClient1.load_time_difference();
+//     const bybitBalance = await async.waterfall([
+//       async function () {
+//         const symbol = req.query?.instrument_token;
+//         let openOrdersData = req.query?.accountType === 'spot' ? await bybitClient.fetchPosition(symbol) : await bybitClient1.fetchPosition(symbol);
+//         if (openOrdersData.info.side != '') {
+//           let getValue = (((openOrdersData.unrealizedPnl / openOrdersData.contracts) * 100) / openOrdersData.entryPrice).toFixed(6);
+//           if (Number(getValue) > 0 && Number(getValue) > Number(req.query?.tradeProfit)) {
+//             let calculateSlPercentage = Math.floor(Number(getValue) / Number(req.query?.tradeProfit))
+//             if (Number(calculateSlPercentage) > 0) {
+//               let newSlPer = (calculateSlPercentage * Number(req.query?.tradeUpSl));
+//               let finalSlPercent = req.query?.stopLossPr > newSlPer ? req.query?.stopLossPr - newSlPer : 0.1
+//               const openOrders = req.query?.accountType === 'spot' ? await bybitClient.fetchOpenOrders(req.query?.instrument_token) : await bybitClient1.fetchOpenOrders(req.query?.instrument_token);
+//               const partialStopLossOrder = openOrders.find(order => order.info.stopOrderType === "PartialStopLoss");
+//               let currentStoploss = partialStopLossOrder?.info?.triggerPrice;
+//               let newSlPrice = (openOrdersData.info.side == 'Sell') ? calculateBuyTPSL(openOrdersData.entryPrice, finalSlPercent) : calculateSellTPSL(openOrdersData.entryPrice, finalSlPercent);
+
+//               if ((openOrdersData.info.side == 'Buy' && newSlPrice > currentStoploss) || (openOrdersData.info.side == 'Sell' && newSlPrice < currentStoploss)) {
+//                 if (openOrders.length != 0) {
+//                   const canceledOrders = await Promise.all(
+//                     openOrders.map(async order => {
+//                       if (order?.info?.stopOrderType == "PartialStopLoss") {
+//                         const canceledOrder = req.query?.accountType === 'spot' ? await bybitClient.cancelOrder(order.id, req.query?.instrument_token) : await bybitClient1.cancelOrder(order.id, req.query?.instrument_token);
+//                         return canceledOrder;
+//                       }
+//                     })
+//                   );
+//                   let finalSymbol = req.query?.instrument_token.replace("/USDT:USDT", 'USDT');
+//                   let item = {};
+//                   item.sl = newSlPrice.toFixed(7);
+//                   item.qty = openOrdersData.info.size;
+//                   item.price = openOrdersData.info.side == 'Buy' ? calculateBuyTPSL(openOrdersData.entryPrice, req.query?.takeProfit) : calculateSellTPSL(openOrdersData.entryPrice, req.query?.takeProfit);
+//                    await setTradingStop(item, finalSymbol)
+//                 }
+//               }
+//             }
+//           }
+
+//           //     let positionDirection1 = openOrdersData.info.side.toLowerCase() == 'sell' ? 'buy' : 'sell';
+//           //     let orderData =  positionDirection1 === 'spot' ? await bybitClient.fetchTicker(req.query?.instrument_token) : await bybitClient1.fetchTicker(req.query?.instrument_token);
+//           //     let sltriggerPriceData = positionDirection1 =='sell' ?   calculateBuyTPSL(orderData.info.markPrice,'0.1') :  calculateSellTPSL(orderData.info.markPrice,'0.1');
+//           //     let openOrdersData2 =  req.query?.accountType === 'spot' ? await bybitClient.createOrder(symbol, "limit", positionDirection1, openOrdersData.info.size, sltriggerPriceData) : await bybitClient1.createOrder(symbol, "limit", positionDirection1, openOrdersData.info.size, sltriggerPriceData);
+//           //     console.log('openOrdersData2: ', openOrdersData2);
+//           //   }
+//         }
+//         return openOrdersData;
+
+//       },
+//     ]);
+//     res.send({
+//       status_api: 200,
+//       message: 'VVV Bybit api update sl data fetch successfully',
+//       data: bybitBalance
+//     });
+//   } catch (err) {
+//     await teleStockMsg("---> VVV Bybit api token data featch failed");
+//     res.send({
+//       status_api: err.code ? err.code : 400,
+//       message: (err && err.message) || 'Something went wrong',
+//       data: err.data ? err.data : null,
+//     });
+//   }
+// });
+
 router.get('/update-sl', async function (req, res) {
   try {
     req.query?.accountType === 'spot' ? await bybitClient.load_time_difference() : await bybitClient1.load_time_difference();
@@ -80,7 +146,9 @@ router.get('/update-sl', async function (req, res) {
             let calculateSlPercentage = Math.floor(Number(getValue) / Number(req.query?.tradeProfit))
             if (Number(calculateSlPercentage) > 0) {
               let newSlPer = (calculateSlPercentage * Number(req.query?.tradeUpSl));
-              let finalSlPercent = req.query?.stopLossPr > newSlPer ? req.query?.stopLossPr - newSlPer : 0.1
+              let findDirrence = req.query?.stopLossPr - newSlPer;
+              let finalSlPercent =findDirrence;
+              // let finalSlPercent = req.query?.stopLossPr > newSlPer ? req.query?.stopLossPr - newSlPer : 0.1
               const openOrders = req.query?.accountType === 'spot' ? await bybitClient.fetchOpenOrders(req.query?.instrument_token) : await bybitClient1.fetchOpenOrders(req.query?.instrument_token);
               const partialStopLossOrder = openOrders.find(order => order.info.stopOrderType === "PartialStopLoss");
               let currentStoploss = partialStopLossOrder?.info?.triggerPrice;
