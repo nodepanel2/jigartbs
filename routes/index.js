@@ -147,7 +147,9 @@ router.get('/update-sl', async function (req, res) {
             if (Number(calculateSlPercentage) > 0) {
               let newSlPer = (calculateSlPercentage * Number(req.query?.tradeUpSl));
               let findDirrence = req.query?.stopLossPr - newSlPer;
-              let finalSlPercent =findDirrence;
+              // let finalSlPercent =findDirrence;
+              let finalSlPercent = findDirrence != 0 ?  findDirrence : 0.1;
+
               // let finalSlPercent = req.query?.stopLossPr > newSlPer ? req.query?.stopLossPr - newSlPer : 0.1
               const openOrders = req.query?.accountType === 'spot' ? await bybitClient.fetchOpenOrders(req.query?.instrument_token) : await bybitClient1.fetchOpenOrders(req.query?.instrument_token);
               const partialStopLossOrder = openOrders.find(order => order.info.stopOrderType === "PartialStopLoss");
