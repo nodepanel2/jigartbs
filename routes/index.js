@@ -337,9 +337,11 @@ router.get('/historical-data', async function (req, res) {
         const limit = Number(req.query?.limit); // 30 days
 
         // Fetch OHLCV (Open/High/Low/Close/Volume) data
-        const ohlcv = req.query?.accountType === 'spot' ? await bybitClient.fetchOHLCV(symbol, timeframe, undefined, limit,params = {"paginate": true, "paginationCalls": 50}) : await bybitClient1.fetchOHLCV(symbol, timeframe, undefined, limit,params = {"paginate": true, "paginationCalls": 50});
+        // const ohlcv = req.query?.accountType === 'spot' ? await bybitClient.fetchOHLCV(symbol, timeframe, undefined, limit,params = {"paginate": true, "paginationCalls": 50}) : await bybitClient1.fetchOHLCV(symbol, timeframe, undefined, limit,params = {"paginate": true, "paginationCalls": 50});
 //        const ohlcv =  req.query?.accountType === 'spot' ? await bybitClient.fetchOHLCV(symbol, timeframe, undefined, limit) : await bybitClient1.fetchOHLCV(symbol, timeframe, undefined, limit);
-
+        let pageLimit = req.query?.pages ?  req.query?.pages : 1
+        const ohlcv = req.query?.accountType === 'spot' ? await bybitClient.fetchOHLCV(symbol, timeframe, undefined, limit,params = {"paginate": true, "paginationCalls": pageLimit}) : await bybitClient1.fetchOHLCV(symbol, timeframe, undefined, limit,params = {"paginate": true, "paginationCalls": pageLimit});
+      
         // Map the response to human-readable format
         const formattedData = ohlcv.map(data => ({
           date: data[0].toString(),
