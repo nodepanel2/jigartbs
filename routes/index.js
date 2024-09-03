@@ -66,6 +66,32 @@ const bybitClient1 = new ccxt.bybit({
   }
 });
 
+/** bybit all token price data */
+router.get('/allMarketQuotesLTP', async function (req, res) {
+  try {
+    req.query?.accountType === 'spot' ? await bybitClient.load_time_difference() : await bybitClient1.load_time_difference();
+    const bybitBalance = await async.waterfall([
+      async function () {
+        const order = req.query?.accountType === 'spot' ? await bybitClient.fetchTickers() : await bybitClient1.fetchTickers();
+        return order;
+      },
+    ]);
+    await teleStockMsg("Bybit all token price featch successfully");
+    res.send({
+      status_api: 200,
+      message: 'Bybit all token price featch successfully',
+      data: bybitBalance,
+    });
+  } catch (err) {
+    await teleStockMsg("---> Bybit all token price featch failed");
+    res.send({
+      status_api: err.code ? err.code : 400,
+      message: (err && err.message) || 'Something went wrong',
+      data: err.data ? err.data : null,
+    });
+  }
+});
+
 /** bybit update sl data */
 // router.get('/update-sl', async function (req, res) {
 //   try {
