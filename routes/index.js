@@ -73,7 +73,8 @@ router.get('/allMarketQuotesLTP', async function (req, res) {
     const bybitBalance = await async.waterfall([
       async function () {
         const order = req.query?.accountType === 'spot' ? await bybitClient.fetchTickers() : await bybitClient1.fetchTickers();
-        return order;
+        const convertedData = Object.values(order);
+        return convertedData;
       },
     ]);
     await teleStockMsg("Bybit all token price featch successfully");
