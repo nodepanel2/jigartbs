@@ -536,7 +536,7 @@ router.get('/buySellApi', async function (req, res) {
                 "data": null
               });
             })
-            let html = '<b>Account Id : </b> Dhruti <b>[Bybit]</b> \n\n' +
+            let html = '<b>Account Id : </b> Jigar <b>[Bybit]</b> \n\n' +
             '🔀 <b>Direction : </b> <b> ' + req.query.transaction_type + '</b>'+(req.query.transaction_type == 'buy'? '🟢' : '🔴')+'\n' +
             '🌐 <b>Script : </b> ' + req.query.instrument_token + '\n' +
             '💰 <b>Price : ₹</b> ' + req.query.price + '\n' +
