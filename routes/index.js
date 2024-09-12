@@ -940,12 +940,17 @@ router.get('/symbolData', async function (req, res) {
   try {
     await bybitClient1.load_time_difference();
     // Get market symbols and quantities
-    const symbolsAndQuantities =  await bybitClient1.loadMarkets();
-
+    const bybitBalance = await async.waterfall([
+      async function () {
+        const symbolsAndQuantities = await bybitClient1.loadMarkets();
+        const convertedData = Object.values(symbolsAndQuantities);
+        return convertedData;
+      },
+    ]);
     res.send({
       status_api: 200,
       message: 'Bybit token single open order position successfully',
-      data: symbolsAndQuantities,
+      data: bybitBalance,
     });
   } catch (err) {
     await teleStockMsg("---> Bybit token single open order position failed");
